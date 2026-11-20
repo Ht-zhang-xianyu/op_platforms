@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vLLM 算子适配控制台</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">OP</div><div><strong>Operator Hub</strong><span>vLLM 适配工作台</span></div></div>
+    <nav>
+      <button class="nav-item active" data-view="dashboard"><span class="nav-code">01</span>总览</button>
+      <button class="nav-item" data-view="operators"><span class="nav-code">02</span>算子清单</button>
+      <button class="nav-item" data-view="documents"><span class="nav-code">03</span>文档中心</button>
+      <button class="nav-item" data-view="jiras"><span class="nav-code">04</span>Jira 追踪</button>
+      <button class="nav-item" data-view="activity"><span class="nav-code">05</span>全部记录</button>
+    </nav>
+    <div class="sidebar-foot"><span class="pulse"></span> 本地 Demo / Mock Jira<br><code>v0.30.0 → v0.34.0</code></div>
+  </aside>
+
+  <div class="main-shell">
+    <header class="topbar">
+      <div><span class="breadcrumb">WORKSPACE / <span id="view-code">01</span></span><h1 id="view-title">总览</h1></div>
+      <div class="topbar-right"><div class="version-pill"><span id="base-version">v0.30.0</span><b>→</b><span id="target-version">v0.34.0</span></div><span id="analysis-status" class="status running">准备中</span><button id="reanalyze" class="secondary">运行 / 复用分析</button></div>
+    </header>
+
+    <main>
+      <section id="view-dashboard" class="view active">
+        <div class="hero"><div><span class="eyebrow">VERSION ANALYSIS</span><h2>从版本差异到可追踪的适配任务</h2><p id="commit-info">正在读取固定 commit…</p></div><button class="primary" data-go="operators">查看算子清单</button></div>
+        <div class="stats">
+          <div><span>默认工作项</span><strong id="stat-total">—</strong><small>通用接口 + TileLang</small></div>
+          <div><span>新增定义</span><strong id="stat-added">—</strong><small>目标版本新增</small></div>
+          <div><span>相关修改</span><strong id="stat-modified">—</strong><small>需人工确认语义</small></div>
+          <div><span>文档 / 已审核</span><strong><i id="stat-documents">—</i> / <i id="stat-approved">—</i></strong><small>Engram 风格草案</small></div>
+          <div><span>Mock Jira</span><strong id="stat-jiras">—</strong><small>幂等创建</small></div>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel"><div class="panel-head"><h3>默认范围</h3><button class="text-button" data-go="operators">调整过滤 →</button></div>
+            <div class="scope-row"><span class="scope-dot general"></span><div><strong>通用自定义算子</strong><p>Python custom_op + 通用 _C 注册</p></div></div>
+            <div class="scope-row"><span class="scope-dot tilelang"></span><div><strong>TileLang Kernel</strong><p>独立分类，不宣称设备无关</p></div></div>
+            <div class="scope-row"><span class="scope-dot excluded"></span><div><strong>默认排除但保留证据</strong><p><span id="stat-excluded">—</span> 项设备专属、测试或调用点结果</p></div></div>
+          </section>
+          <section class="panel"><div class="panel-head"><h3>最近动态</h3><button class="text-button" data-go="activity">全部记录 →</button></div><div id="recent-activity" class="event-list compact"><span class="muted">暂无动态</span></div></section>
+        </div>
+        <div class="notice">范围分类是静态初筛，不是最终设备无关结论。所有排除项均可在“算子清单 → 全部结果”中查看，并带有分类理由。</div>
+      </section>
+
+      <section id="view-operators" class="view">
+        <div class="section-head"><div><h2>算子清单</h2><p>默认仅展示通用自定义算子、通用 _C 与 TileLang</p></div><button id="batch-documents" class="primary" disabled>批量生成文档</button></div>
+        <div class="panel">
+          <div class="toolbar"><input id="op-search" type="search" placeholder="搜索名称或路径"><select id="scope-filter"><option value="default">默认工作项</option><option value="general_custom_op">通用自定义算子</option><option value="tilelang">TileLang</option><option value="device_specific">设备专属</option><option value="call_site">仅调用点</option><option value="all">全部结果</option></select><select id="change-filter"><option value="all">全部变化</option><option value="added">新增</option><option value="modified">相关修改</option><option value="removed">移除</option></select><select id="doc-filter"><option value="all">全部文档状态</option><option value="none">未生成</option><option value="draft">待审核</option><option value="approved">已审核</option></select></div>
+          <div class="list-actions"><label><input id="select-all" type="checkbox"> 选择当前结果</label><span id="op-summary" class="muted"></span></div>
+          <div class="table-wrap tall"><table><thead><tr><th></th><th>算子</th><th>范围 / 类型</th><th>变化</th><th>文档</th><th>Jira</th></tr></thead><tbody id="operator-rows"><tr><td colspan="6" class="empty">正在加载…</td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="view-documents" class="view">
+        <div class="section-head"><div><h2>文档中心</h2><p>所有历史文档集中保留，可阅读、下载并追溯源码和 Jira</p></div><span id="doc-count" class="count-badge">0 份</span></div>
+        <div class="panel"><div class="toolbar two"><input id="document-search" type="search" placeholder="搜索文档或算子"><select id="document-status"><option value="all">全部状态</option><option value="draft">待审核</option><option value="approved">已审核</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>算子 / 文档</th><th>版本</th><th>生成器</th><th>状态</th><th>生成时间</th><th>Jira</th></tr></thead><tbody id="document-rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="view-jiras" class="view">
+        <div class="section-head"><div><h2>Jira 追踪</h2><p>当前为 Mock Jira；单号、文档和算子关系已经落库</p></div><span id="jira-count" class="count-badge">0 项</span></div>
+        <div class="panel"><div class="table-wrap"><table><thead><tr><th>单号</th><th>算子</th><th>版本</th><th>文档</th><th>状态</th><th>创建时间</th></tr></thead><tbody id="jira-rows"></tbody></table></div></div>
+      </section>
+
+      <section id="view-activity" class="view">
+        <div class="section-head"><div><h2>全部记录</h2><p>版本分析、文档生成、审核和 Jira 创建的完整事件流</p></div><span id="event-count" class="count-badge">0 条</span></div>
+        <div class="panel"><div class="toolbar two"><input id="event-search" type="search" placeholder="搜索算子或事件"><select id="event-type"><option value="all">全部事件</option><option value="analysis">版本分析</option><option value="document">文档</option><option value="jira">Jira</option></select></div><div id="all-events" class="event-list"></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+<aside id="drawer" class="drawer"><div id="drawer-content"></div></aside>
+<div id="toast" class="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
